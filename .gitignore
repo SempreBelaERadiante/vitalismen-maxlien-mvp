@@ -1,0 +1,26 @@
+# Python runtime
+venv/
+__pycache__/
+*.pyc
+
+# Environment and local config
+.env
+env
+
+# Local databases and runtime state
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Backup snapshots kept only on server
+app.py.*
+app.py.NEW
+app.py.oficial
+app.py.OK_*
+app.py.STABLE_*
+app.py.FROZEN_*
+app yes
+
+# Misc
+.DS_Store
+*.log
