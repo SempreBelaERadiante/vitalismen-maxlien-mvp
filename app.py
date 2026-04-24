@@ -139,7 +139,7 @@ def _final90_pixel_for_host(host: str) -> str:
     h = (host or "").lower()
     px_ec = os.getenv("MVP_FB_PIXEL_ID_EC", PIXEL_EC_DEFAULT).strip()
     px_co = os.getenv("MVP_FB_PIXEL_ID_CO", PIXEL_CO_DEFAULT).strip()
-    return px_co if h.startswith("co.") else px_ec
+    return px_co if _mx_final90_is_co_host(h) else px_ec
 
 def _final90_get_ip(req):
     try:
@@ -181,8 +181,8 @@ def _final90_capi_send_lead(host: str, data: dict, ua: str, ip: str):
         token = (os.getenv("MVP_FB_ACCESS_TOKEN_CO") or "").strip()
         pixel_id = (os.getenv("MVP_FB_PIXEL_ID_CO") or PIXEL_CO_DEFAULT).strip()
     else:
-        token = (os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
-        pixel_id = (os.getenv("MVP_FB_PIXEL_ID_EC") or PIXEL_EC_DEFAULT).strip()
+        token = (os.getenv("MVP_FB_ACCESS_TOKEN") or os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
+        pixel_id = (os.getenv("MVP_FB_PIXEL_ID") or PIXEL_EC_DEFAULT).strip()
 
     if not token:
         return False, "missing_token"
@@ -309,8 +309,8 @@ def _final90_capi_send_lead_rich(host: str, data: dict, ua: str, ip: str):
         token = (os.getenv("MVP_FB_ACCESS_TOKEN_CO") or "").strip()
         pixel_id = (os.getenv("MVP_FB_PIXEL_ID_CO") or PIXEL_CO_DEFAULT).strip()
     else:
-        token = (os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
-        pixel_id = (os.getenv("MVP_FB_PIXEL_ID_EC") or PIXEL_EC_DEFAULT).strip()
+        token = (os.getenv("MVP_FB_ACCESS_TOKEN") or os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
+        pixel_id = (os.getenv("MVP_FB_PIXEL_ID") or PIXEL_EC_DEFAULT).strip()
 
     if not token:
         return False, "missing_token", 0, ""
@@ -882,14 +882,12 @@ def send_meta_capi_event(event_name: str, event_id: str, phone_norm: str, value:
     pixel_id = ""
     FB_ACCESS_TOKEN = ""
 
-    if host == "co.maxlien.shop" or host.endswith(".co.maxlien.shop"):
-        # CO — FIXO
+    if _mx_final90_is_co_host(host):
         pixel_id = (os.getenv("MVP_FB_PIXEL_ID_CO") or PIXEL_CO_DEFAULT).strip()
         FB_ACCESS_TOKEN = (os.getenv("MVP_FB_ACCESS_TOKEN_CO") or "").strip()
     else:
-        # EC — FIXO (não mexer)
-        pixel_id = (os.getenv("MVP_FB_PIXEL_ID_EC") or PIXEL_EC_DEFAULT).strip()
-        FB_ACCESS_TOKEN = (os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
+        pixel_id = (os.getenv("MVP_FB_PIXEL_ID") or PIXEL_EC_DEFAULT).strip()
+        FB_ACCESS_TOKEN = (os.getenv("MVP_FB_ACCESS_TOKEN") or os.getenv("MVP_FB_ACCESS_TOKEN_EC") or "").strip()
 
     # Se não configurado, não quebra o fluxo
     if not pixel_id or not FB_ACCESS_TOKEN:
